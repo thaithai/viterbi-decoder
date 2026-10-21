@@ -1,13 +1,13 @@
 module mem_path(
     input wire clk, rst_n,
+    
     input wire en_write,
-    input wire en_read,
-    input wire [2:0] cnt_write,
-    input wire [2:0] cnt_read,
-    input wire path_in1,
-    input wire path_in2,
-    input wire path_in3,
-    input wire path_in4,
+
+    input wire [2:0] addr_write,
+    input wire [2:0] addr_read,
+
+    input wire [3:0] path,
+    
     output reg [3:0] path_bit,
     output reg mem_done
 );
@@ -20,18 +20,18 @@ module mem_path(
             mem_done <= 1'b0;
         end else begin
             if (en_write) begin
-                mem[cnt_write] <= {path_in4, path_in3, path_in2, path_in1};
-                mem_done <= 1'b1;
+                mem[addr_write] <= path;
+                if (addr_write == 3'd7) begin
+                    mem_done <= 1'b1;
+                end else begin
+                    mem_done <= 1'b0;
+                end
             end else begin
                 mem_done <= 1'b0;
             end
         end
     end
 
-    always @(*) begin
-        if (en_read)
-            path_bit = mem[cnt_read];
-        else
-            path_bit = 4'b0000;
-    end
+    assign path_bit = mem[addr_read];
+
 endmodule
